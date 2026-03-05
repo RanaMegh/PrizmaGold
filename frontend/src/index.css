@@ -15,9 +15,12 @@ body,
   overflow: hidden;
 }
 
-
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
   background: #050608;
   color: #111827;
@@ -31,3 +34,64 @@ button {
 input {
   font-family: inherit;
 }
+
+/* market */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;
+  background: #f8f7f4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 160, 23, 0.25);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 160, 23, 0.5);
+}
+
+/* Pulse animation for LIVE dot */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 4px #22c55e;
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 10px #22c55e;
+  }
+}
+
+/* Smooth input focus */
+input:focus {
+  border-color: rgba(212, 160, 23, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.1) !important;
+}
+
+/* fin Market */
