@@ -3,7 +3,6 @@ import React from "react";
 const ProfileCard = () => {
   return (
     <div className="card profile-card">
-
       {/* Banner décoratif */}
       <div className="profile-banner">
         <div className="banner-pattern" />
@@ -50,7 +49,6 @@ const ProfileCard = () => {
 
       {/* Bouton */}
       <button className="edit-btn">✎ Edit Profile</button>
-
     </div>
   );
 };
