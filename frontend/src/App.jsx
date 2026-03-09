@@ -4,6 +4,9 @@ import StudioPage from "./component/StudioPage";
 import SideBar from "./component/SideBar";
 import Market from "./component/Market";
 import EditProfile from "./component/EditProfile";
+import ProfileCard from "./component/ProfileCard";
+import StatsSection from "./component/StatsSection";
+import "./styles/styles.css";
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -83,98 +86,11 @@ function Profile({ setActiveTab }) {
       transition={{ duration: 0.4 }}
       style={{ padding: "40px 36px" }}
     >
-      <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: 32, color: "#1a1a1a" }}>
+      <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: 32, color: "#1a1a1a", marginBottom: 32 }}>
         Profile
       </h1>
-      <div
-        style={{
-          marginTop: 32,
-          background: "#fff",
-          borderRadius: 20,
-          padding: 32,
-          boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
-          maxWidth: 480,
-          border: "1px solid rgba(0,0,0,0.05)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 28 }}>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #d4a017, #8b6914)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-              boxShadow: "0 4px 16px rgba(212,160,23,0.3)",
-              border: "3px solid rgba(212,160,23,0.3)",
-            }}
-          >
-            👑
-          </div>
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'DM Sans', sans-serif", color: "#111" }}>
-              Alexandra T.
-            </div>
-            <div style={{ fontSize: 13, color: "#d4a017", marginTop: 2 }}>
-              Master Jeweler · Premium Member
-            </div>
-          </div>
-        </div>
-
-        <div style={{ marginBottom: 24 }}>
-          {[
-            { label: "Email", value: "alexandra@prizma.gold" },
-            { label: "Account Type", value: "Premium" },
-            { label: "Member Since", value: "January 2023" },
-            { label: "Location", value: "Geneva, Switzerland" },
-          ].map((row) => (
-            <div
-              key={row.label}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "12px 0",
-                borderBottom: "1px solid #f5f5f0",
-              }}
-            >
-              <span style={{ color: "#888", fontSize: 13, fontFamily: "'DM Sans', sans-serif" }}>
-                {row.label}
-              </span>
-              <span style={{ color: "#111", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>
-                {row.value}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.02, backgroundColor: "#333" }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setActiveTab("edit-profile")}
-          style={{
-            width: "100%",
-            padding: "14px",
-            borderRadius: "12px",
-            backgroundColor: "#1a1a1a",
-            color: "#fff",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: "600",
-            fontFamily: "'DM Sans', sans-serif",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-          }}
-        >
-          <span style={{ fontSize: "16px" }}>✎</span>
-          Edit Profile
-        </motion.button>
-      </div>
+      <ProfileCard onEditClick={() => setActiveTab("edit-profile")} />
+      <StatsSection />
     </motion.div>
   );
 }
