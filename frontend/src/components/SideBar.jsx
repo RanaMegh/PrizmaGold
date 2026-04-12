@@ -93,7 +93,7 @@ const navItems = [
   },
 ];
 
-export default function SideBar({ activeTab, setActiveTab }) {
+export default function SideBar({ activeTab, setActiveTab ,onLogout }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (

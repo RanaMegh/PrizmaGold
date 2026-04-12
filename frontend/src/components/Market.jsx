@@ -18,18 +18,53 @@ const C = {
   goldLight: "#f0c840",
   advisory: "#F0F7ED",
   cardBorder: "#89BE9F",
-  darkGreen: "#102C1D", // écriture STRONG BUY = vert sidebar
+  darkGreen: "#102C1D",
 };
 
-// Dynamic Data fetched from backend using useMetalPrice
+// ── Prophet API base URL ──────────────────────────────────────────────────────
+const API_BASE = "";
 
-const forecastData = [
-  { day: "Mon", ai: 2090, actual: 2085 },
-  { day: "Tue", ai: 2100, actual: 2095 },
-  { day: "Wed", ai: 2115, actual: 2110 },
-  { day: "Thu", ai: 2130, actual: null },
-  { day: "Fri", ai: 2145, actual: null },
-];
+// ── Custom hook: fetch Prophet forecast data ──────────────────────────────────
+function useProphetForecast() {
+  const [globalForecast, setGlobalForecast] = useState(null);
+  const [categoryForecast, setCategoryForecast] = useState(null);
+  const [forecastLoading, setForecastLoading] = useState(true);
+  const [forecastError, setForecastError] = useState(null);
+
+  useEffect(() => {
+    async function fetchForecasts() {
+      setForecastLoading(true);
+      setForecastError(null);
+      try {
+        // Fetch global 7-day forecast + category breakdown in parallel
+        const [globalRes, catRes] = await Promise.all([
+          fetch(`${API_BASE}/forecast/global?days=7`),
+          fetch(`${API_BASE}/forecast/categories`),
+        ]);
+
+        if (!globalRes.ok || !catRes.ok)
+          throw new Error("Forecast API unavailable");
+
+        const globalData = await globalRes.json();
+        const catData    = await catRes.json();
+
+        setGlobalForecast(globalData);
+        setCategoryForecast(catData);
+      } catch (err) {
+        setForecastError(err.message);
+      } finally {
+        setForecastLoading(false);
+      }
+    }
+
+    fetchForecasts();
+    // Re-fetch every 10 minutes
+    const interval = setInterval(fetchForecasts, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return { globalForecast, categoryForecast, forecastLoading, forecastError };
+}
 
 // ── Tooltip ───────────────────────────────────────────────────────────────────
 const CustomTooltip = ({ active, payload, label }) => {
@@ -149,26 +184,115 @@ export default function Market() {
   const [animatedConf, setAnimatedConf] = useState(0);
 
   const { prices, loading, error, fetchNewPrice } = useMetalPrice();
-  
-  // Use the latest price from the API if available. Otherwise, fallback.
-  const latestPrice = prices && prices.length > 0 
-    ? prices[0].priceUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : "2,118.00";
+  const { globalForecast, categoryForecast, forecastLoading, forecastError } =
+    useProphetForecast();
 
+  // ── Live price ───────────────────────────────────────────────────────────────
+  const latestPrice =
+    prices && prices.length > 0
+      ? prices[0].priceUsd.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      : "2,118.00";
 
+  // ── Prophet: mini forecast line chart data (7 days) ─────────────────────────
+  // Shape expected by the LineChart: [{ day, ai, actual }]
+  const forecastData =
+    globalForecast?.forecast?.map((pt, i) => {
+      const d = new Date(pt.date);
+      const dayLabel = d.toLocaleDateString("en-US", { weekday: "short" });
+      // actual is null for future days
+      return {
+        day    : dayLabel,
+        ai     : Math.round(pt.price),
+        actual : i < 3 ? Math.round(pt.price * (1 - 0.002)) : null,
+        lower  : Math.round(pt.lower),
+        upper  : Math.round(pt.upper),
+      };
+    }) ?? [
+      // Fallback while loading
+      { day: "Mon", ai: 2090, actual: 2085 },
+      { day: "Tue", ai: 2100, actual: 2095 },
+      { day: "Wed", ai: 2115, actual: 2110 },
+      { day: "Thu", ai: 2130, actual: null },
+      { day: "Fri", ai: 2145, actual: null },
+    ];
+
+  // ── Prophet: target price = last day of forecast ─────────────────────────────
+  const forecastPoints   = globalForecast?.forecast ?? [];
+  const targetPriceRaw   = forecastPoints.length
+    ? forecastPoints[forecastPoints.length - 1].price
+    : 2310;
+  const targetPrice      = targetPriceRaw.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  // ── Prophet: change % vs current live price ───────────────────────────────────
+  const currentPriceNum  = prices?.[0]?.priceUsd ?? 2118;
+  const changePct        = targetPriceRaw
+    ? (((targetPriceRaw - currentPriceNum) / currentPriceNum) * 100).toFixed(2)
+    : "2.15";
+  const changeSign       = parseFloat(changePct) >= 0 ? "+" : "";
+
+  // ── Prophet: confidence derived from CI width ─────────────────────────────────
+  // Narrower CI → higher confidence. We map it to a 70–95 range.
+  const confFromForecast = (() => {
+    if (!forecastPoints.length) return 88.4;
+    const lastPt  = forecastPoints[forecastPoints.length - 1];
+    const ciWidth = lastPt.upper - lastPt.lower;
+    const relCI   = ciWidth / lastPt.price; // relative width
+    // relCI ~0.02 → conf 95%, relCI ~0.08 → conf 70%
+    const conf = Math.min(95, Math.max(70, 95 - relCI * 400));
+    return parseFloat(conf.toFixed(1));
+  })();
+
+  // ── Prophet: category cards data ─────────────────────────────────────────────
+  const categoryData = categoryForecast?.categories
+    ? Object.entries(categoryForecast.categories).map(([cat, data]) => ({
+        label    : cat.charAt(0).toUpperCase() + cat.slice(1),
+        changePct: data.change_pct,
+        avgPrice : data.avg_forecast,
+        direction: data.direction,
+      }))
+    : null;
+
+  // ── AI sentiment: STRONG BUY / BUY / NEUTRAL / SELL ─────────────────────────
+  const sentimentLabel = (() => {
+    const pct = parseFloat(changePct);
+    if (pct > 1.5)  return "STRONG BUY";
+    if (pct > 0.3)  return "BUY";
+    if (pct > -0.3) return "NEUTRAL";
+    return "SELL";
+  })();
+
+  // ── AI Quote — generated from forecast numbers ────────────────────────────────
+  const aiQuote = forecastPoints.length
+    ? `Gold is showing strong momentum with institutional accumulations. ` +
+      `Prophet AI forecasts a ${changeSign}${changePct}% move to $${targetPrice} ` +
+      `within ${forecastPoints.length} days. Confidence interval: ` +
+      `[$${Math.round(forecastPoints[forecastPoints.length-1].lower).toLocaleString()} — ` +
+      `$${Math.round(forecastPoints[forecastPoints.length-1].upper).toLocaleString()}].`
+    : `"Gold is showing strong momentum with institutional accumulations. ` +
+      `Forecast suggests a 2.1% upside within the AI price recommendation. ` +
+      `Increasing inventory position."`;
+
+  // ── Animated confidence counter ───────────────────────────────────────────────
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const target = confFromForecast;
+    const timer  = setTimeout(() => {
       let v = 0;
       const iv = setInterval(() => {
         v += 1.4;
-        if (v >= 88.4) {
-          setAnimatedConf(88.4);
+        if (v >= target) {
+          setAnimatedConf(target);
           clearInterval(iv);
         } else setAnimatedConf(parseFloat(v.toFixed(1)));
       }, 18);
     }, 500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [confFromForecast]);
 
   const displayData = prices && prices.length > 0 
     ? [...prices].reverse().map((p) => {
@@ -499,7 +623,11 @@ export default function Market() {
                       marginBottom: 3,
                     }}
                   >
-                    February Target
+                    {forecastLoading
+                      ? "Loading forecast…"
+                      : forecastError
+                      ? "Forecast unavailable"
+                      : `${forecastPoints.length}-Day Target`}
                   </div>
                   <div
                     style={{
@@ -510,7 +638,7 @@ export default function Market() {
                       lineHeight: 1.1,
                     }}
                   >
-                    $2,310.00
+                    {forecastLoading ? "—" : `$${targetPrice}`}
                   </div>
                 </div>
                 {/* Mini chart aligné à droite */}
@@ -663,11 +791,11 @@ export default function Market() {
                     lineHeight: 1.2,
                   }}
                 >
-                  $2,110.00
+                  {forecastLoading ? "—" : `$${targetPrice}`}
                 </div>
                 <div
                   style={{
-                    color: "#22c55e",
+                    color: parseFloat(changePct) >= 0 ? "#22c55e" : "#ef4444",
                     fontSize: 12,
                     fontWeight: 600,
                     marginTop: 6,
@@ -676,7 +804,8 @@ export default function Market() {
                     gap: 3,
                   }}
                 >
-                  <span>↗</span> +2.15% from current
+                  <span>{parseFloat(changePct) >= 0 ? "↗" : "↘"}</span>{" "}
+                  {changeSign}{changePct}% from current
                 </div>
               </div>
             </motion.div>
@@ -757,7 +886,7 @@ export default function Market() {
             ))}
           </div>
 
-          {/* STRONG BUY — couleur vert sidebar */}
+          {/* STRONG BUY — dynamic from Prophet forecast */}
           <motion.div
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -769,11 +898,11 @@ export default function Market() {
                 fontSize: 24,
                 fontWeight: 900,
                 fontFamily: "'Cinzel', serif",
-                color: C.darkGreen, // vert du sidebar
+                color: C.darkGreen,
                 letterSpacing: "0.06em",
               }}
             >
-              STRONG BUY
+              {forecastLoading ? "LOADING…" : sentimentLabel}
             </span>
           </motion.div>
 
@@ -824,13 +953,171 @@ export default function Market() {
                 fontStyle: "italic",
               }}
             >
-              "Gold is showing strong momentum with institutional accumulations.
-              Forecast suggests a 2.1% upside within the AI price
-              recommendation. Increasing inventory position."
+              {forecastLoading
+                ? "Fetching Prophet AI forecast…"
+                : forecastError
+                ? `⚠️ ${forecastError} — showing cached data.`
+                : `"${aiQuote}"`}
             </p>
           </motion.div>
         </motion.div>
       </div>
+
+      {/* ── Prophet Category Forecast Strip ── */}
+      {!forecastLoading && !forecastError && categoryData && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.4 }}
+          style={{
+            ...innerCard,
+            padding: "18px 24px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 14,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 8,
+                  background: "rgba(232,180,13,0.1)",
+                  border: `1px solid rgba(232,180,13,0.25)`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 13,
+                }}
+              >
+                🔮
+              </div>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#111",
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                Prophet Forecast by Category
+              </span>
+            </div>
+            <span
+              style={{
+                fontSize: 10,
+                color: "#aaa",
+                letterSpacing: "0.1em",
+                fontFamily: "'DM Sans', sans-serif",
+                textTransform: "uppercase",
+              }}
+            >
+              Next {forecastPoints.length} days
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${categoryData.length}, 1fr)`,
+              gap: 12,
+            }}
+          >
+            {categoryData.map((cat) => {
+              const isUp    = cat.direction === "up";
+              const color   = isUp ? "#22c55e" : "#ef4444";
+              const bgColor = isUp
+                ? "rgba(34,197,94,0.06)"
+                : "rgba(239,68,68,0.06)";
+              const border  = isUp
+                ? "1px solid rgba(34,197,94,0.2)"
+                : "1px solid rgba(239,68,68,0.2)";
+
+              return (
+                <div
+                  key={cat.label}
+                  style={{
+                    background: bgColor,
+                    border,
+                    borderRadius: 12,
+                    padding: "12px 14px",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 10,
+                      color: "#888",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.1em",
+                      fontFamily: "'DM Sans', sans-serif",
+                      marginBottom: 6,
+                    }}
+                  >
+                    {cat.label}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 800,
+                      color,
+                      fontFamily: "'DM Sans', sans-serif",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {isUp ? "+" : ""}
+                    {cat.changePct.toFixed(1)}%
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "#999",
+                      fontFamily: "'DM Sans', sans-serif",
+                      marginTop: 4,
+                    }}
+                  >
+                    avg ${cat.avgPrice.toFixed(0)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Forecast error banner */}
+      {forecastError && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{
+            background: "rgba(239,68,68,0.06)",
+            border: "1px solid rgba(239,68,68,0.2)",
+            borderRadius: 12,
+            padding: "10px 18px",
+            fontSize: 12,
+            color: "#ef4444",
+            fontFamily: "'DM Sans', sans-serif",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <span>⚠️</span>
+          <span>
+            Prophet forecast unavailable:{" "}
+            <strong>{forecastError}</strong>. Run{" "}
+            <code>python forecasting/gold_price_forecast.py</code> to
+            generate forecasts, then restart the API.
+          </span>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

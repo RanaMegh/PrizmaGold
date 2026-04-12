@@ -185,7 +185,7 @@ def get_stats():
         "avg_trend_score" : round(float(df["trend_score"].mean()), 4),
         "avg_price"       : round(float(df["price"].mean()), 2),
         "top_cluster"     : str(df.nlargest(1, "trend_score")
-                                  ["cluster_name"].iloc[0]),
+                            ["cluster_name"].iloc[0]),
         "clusters"        : int(df["cluster"].nunique())
     }
     
@@ -232,3 +232,49 @@ if __name__ == "__main__":
     import sys, os
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     uvicorn.run("trendsPipelining.main:app", host="0.0.0.0", port=8000, reload=True)
+
+#######################################################
+#FORECASTING PART
+
+FORECAST_DIR = "data/forecasts"
+
+@app.get("/forecast/global")
+def get_global_forecast(days: int = 10):
+    path = f"{FORECAST_DIR}/forecast_global.csv"
+    if not os.path.exists(path):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Run gold_price_forecast.py first")
+    fc = pd.read_csv(path, parse_dates=["ds"])
+    future = fc[fc["actual"].isna()].head(days)
+    return {
+        "status"   : "success",
+        "forecast" : [
+            {
+                "date"  : row["ds"].strftime("%Y-%m-%d"),
+                "price" : round(float(row["yhat"]), 2),
+                "lower" : round(float(row["yhat_lower"]), 2),
+                "upper" : round(float(row["yhat_upper"]), 2),
+            }
+            for _, row in future.iterrows()
+        ]
+    }
+
+@app.get("/forecast/categories")
+def get_category_forecasts():
+    results = {}
+    for cat in ["rings", "necklaces", "bracelets", "earrings"]:
+        path = f"{FORECAST_DIR}/forecast_{cat}.csv"
+        if not os.path.exists(path):
+            continue
+        fc = pd.read_csv(path, parse_dates=["ds"])
+        future = fc[fc["actual"].isna()]
+        hist   = fc[fc["actual"].notna()]
+        last   = float(hist["actual"].iloc[-1]) if len(hist) else 0
+        avg_fc = float(future["yhat"].mean())
+        change = round((avg_fc - last) / last * 100, 2) if last else 0
+        results[cat] = {
+            "avg_forecast" : round(avg_fc, 2),
+            "change_pct"   : change,
+            "direction"    : "up" if change > 0 else "down"
+        }
+    return {"status": "success", "categories": results}
