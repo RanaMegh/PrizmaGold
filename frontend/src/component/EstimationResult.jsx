@@ -48,9 +48,9 @@ const EstimationResult = ({ result, specs, onRecalculate, onBack }) => {
       </div>
 
       <div className={styles.resultActions}>
-        <button className={styles.secondaryBtn} onClick={onRecalculate}>↩ Edit Rules</button>
-        <button className={styles.secondaryBtn} onClick={onBack}>← Back to Studio</button>
-        <button className={styles.primaryBtn} onClick={() => window.print()}>🖨 Print Invoice</button>
+        <button className={styles.secondaryBtn} onClick={onRecalculate}>Edit Rules</button>
+        <button className={styles.secondaryBtn} onClick={onBack}> Back to Studio</button>
+        <button className={styles.primaryBtn} onClick={() => window.print()}>Print Invoice</button>
       </div>
     </div>
   );

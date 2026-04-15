@@ -101,7 +101,7 @@ const EstimationForm = ({ onSubmit }) => {
       </div>
 
       <button type="submit" className={styles.submitBtn}>
-        Calculate Estimate →
+        Calculate Estimate
       </button>
     </form>
   );

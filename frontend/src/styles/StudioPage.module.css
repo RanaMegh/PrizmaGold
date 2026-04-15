@@ -51,7 +51,8 @@
   position: relative;
   flex: 0 38%;
   margin-right: 10px;
-  padding: 24px 24px 28px;
+  margin-left: 10px;
+  padding: 22px 22px 26px;
   background: radial-gradient(circle, #ffffffd2);
   display: flex;
   flex-direction: column;
@@ -59,34 +60,6 @@
   overflow: hidden;
   border-radius: 30px;
   width: auto;
-}
-
-.backButton {
-  position: absolute;
-  top: 18px;
-  left: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  outline: none;
-  background: radial-gradient(circle at 30% 30%, #ffeeb2, var(--gold));
-  box-shadow: 0 8px 20px rgba(153, 120, 40, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.backButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(153, 120, 40, 0.75);
-}
-
-.backIcon {
-  font-size: 20px;
-  color: #62410b;
 }
 
 .detailsTitle {
@@ -548,30 +521,84 @@
 @media (max-width: 991px) {
   .mainWrapper {
     flex-direction: column;
-    max-width: 640px;
+    max-width: 100%;
+    height: auto;
+    min-height: 90vh;
+    margin: 10px;
+    border-radius: 20px;
   }
 
   .detailsPanel {
-    flex-basis: auto;
+    flex: none;
+    width: 100%;
+    margin: 0 0 12px 0;
+    padding: 20px 18px 24px;
+    height: auto;
+  }
+
+  .productCard {
+    width: 100%;
+    max-width: 340px; /* prevents it from becoming too wide on mobile */
+  }
+
+  .designViewerWrapper {
+    height: 220px; /* slightly taller for better image visibility */
   }
 
   .aiPanel {
-    min-height: 380px;
+    min-height: 420px;
   }
 
+  /* Make confirm button inside productCard more mobile-friendly */
   .confirmBtn {
-    bottom: 16px;
-    padding: 12px 28px;
-    font-size: 14px;
+    position: static;           /* important: remove absolute positioning */
+    transform: none;
+    margin-top: 16px;
+    width: 100%;
+    max-width: 280px;
   }
 }
 
 @media (max-width: 600px) {
-  .pageRoot    { padding: 12px; }
-  .mainWrapper { border-radius: 20px; }
-  .detailsPanel { padding: 20px 18px 22px; }
-  .detailsTitle { font-size: 24px; }
-  .aiTitle      { font-size: 22px; }
-  .inputBar     { padding-left: 14px; }
-  .sendButton   { width: 36px; height: 36px; }
+  .pageRoot {
+    padding: 12px 8px;
+  }
+
+  .mainWrapper {
+    border-radius: 16px;
+  }
+
+  .detailsPanel {
+    padding: 18px 16px 22px;
+  }
+
+  .detailsTitle {
+    font-size: 26px;
+  }
+
+  .aiTitle {
+    font-size: 24px;
+  }
+
+  .designViewerWrapper {
+    height: 200px;
+  }
+
+  .productCard {
+    border-width: 1.5px;
+  }
+
+  .confirmBtn {
+    padding: 13px 24px;
+    font-size: 14px;
+  }
+
+  .inputBar {
+    padding-left: 14px;
+  }
+
+  .sendButton {
+    width: 38px;
+    height: 38px;
+  }
 }

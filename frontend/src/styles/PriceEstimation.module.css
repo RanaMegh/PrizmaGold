@@ -138,7 +138,7 @@
  
 .formPanel {
   flex: 1;
-  background: rgba(7, 16, 19, 0.94);
+  background: #0B301B;
   border-radius: 30px;
   border: 1px solid #EAB308;
   padding: 36px 40px;
@@ -404,44 +404,82 @@
 }
  
 /* ── RESPONSIVE ──────────────────────────────────── */
- 
+
 @media (max-width: 991px) {
   .pageRoot {
     flex-direction: column;
-    padding: 16px;
+    padding: 16px 12px;
     align-items: stretch;
-    gap: 12px;
+    gap: 16px;
   }
- 
+
   .previewPanel {
     flex: none;
     max-width: 100%;
     height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 20px;
+    max-height: none;
+    padding: 24px 20px;
   }
- 
+
   .previewImageWrapper {
-    min-height: 160px;
-    flex: 1 1 200px;
+    min-height: 200px;
   }
- 
+
+  .previewImage {
+    max-height: 240px;
+  }
+
   .specsSummary {
-    flex: 1 1 200px;
+    width: 100%;
   }
- 
+
   .formPanel {
     height: auto;
     max-height: none;
-    padding: 28px 24px;
+    padding: 32px 28px;
   }
 }
- 
+
 @media (max-width: 600px) {
-  .formPanel   { padding: 22px 18px; }
-  .formTitle   { font-size: 22px; }
-  .resultActions { flex-direction: column; }
+  .pageRoot {
+    padding: 12px 8px;
+  }
+
+  .previewPanel {
+    padding: 20px 16px;
+  }
+
+  .previewImageWrapper {
+    min-height: 180px;
+  }
+
+  .previewImage {
+    max-height: 210px;
+  }
+
+  .formPanel {
+    padding: 24px 18px;
+  }
+
+  .formTitle {
+    font-size: 23px;
+  }
+
+  .formSubtitle {
+    font-size: 12.5px;
+  }
+
+  .resultActions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
   .secondaryBtn,
-  .primaryBtn   { min-width: auto; }
+  .primaryBtn {
+    width: 100%;
+  }
+
+  .breakdown {
+    padding: 16px 18px;
+  }
 }

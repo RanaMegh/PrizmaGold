@@ -143,7 +143,7 @@ const PriceEstimationPage = ({ confirmedDesign, onBack }) => {
  
       {/* ── Left panel: confirmed design preview ── */}
       <div className={styles.previewPanel}>
-        <button className={styles.backBtn} onClick={onBack}>← Back to Studio</button>
+        <button className={styles.backBtn} onClick={onBack}>Back to Studio</button>
  
         <div className={styles.previewImageWrapper}>
           {imageUrl ? (
@@ -151,7 +151,7 @@ const PriceEstimationPage = ({ confirmedDesign, onBack }) => {
           ) : (
             <div className={styles.previewPlaceholder}>💍</div>
           )}
-          <div className={styles.confirmedBadge}>✦ Confirmed Design</div>
+          <div className={styles.confirmedBadge}>Confirmed Design</div>
         </div>
  
         <div className={styles.specsSummary}>
@@ -167,7 +167,7 @@ const PriceEstimationPage = ({ confirmedDesign, onBack }) => {
         {/* Mock mode notice — remove once backend is live */}
         {USE_MOCK && (
           <div className={styles.mockNotice}>
-            🧪 Mock Mode — using simulated gold price of ${MOCK_GOLD_PRICE_PER_OZ}/oz
+             Mock Mode — using simulated gold price of ${MOCK_GOLD_PRICE_PER_OZ}/oz
           </div>
         )}
       </div>

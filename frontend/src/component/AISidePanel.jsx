@@ -15,8 +15,8 @@ const USE_MOCK = true;
 //  response that matches the shape the real backend will return:
 //  { reply: string, specs: object, imageUrl: string }
 // ─────────────────────────────────────────────────────────────────
-const MOCK_DESIGN_IMAGE =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/640px-Camponotus_flavomarginatus_ant.jpg";
+const MOCK_DESIGN_IMAGE = "../assets/Bague.jpg"; // Replace with your local image URL or a placeholder image URL
+   // Replace with your local image URL or a placeholder image URL
   // ↑ Replace this with any ring/jewelry image URL you have locally,
   //   e.g. "/assets/sample-ring.png" from your public folder.
   //   Using a placeholder URL here so the image viewer has something to show.

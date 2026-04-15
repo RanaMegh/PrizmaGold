@@ -15,10 +15,9 @@ const StudioPage = () => {
   });
 
   const [activeMetal, setActiveMetal] = useState("emerald");
-  const [imageUrl,    setImageUrl]    = useState(null);  // 2D image from AI backend
-  const [confirmed,   setConfirmed]   = useState(false); // controls Module 3 transition
+  const [imageUrl,    setImageUrl]    = useState(null);
+  const [confirmed,   setConfirmed]   = useState(false);
 
-  /* Called by AISidePanel when the backend returns a response */
   const handleDesignUpdate = (newSpecs, newImageUrl) => {
     if (newSpecs) {
       setSpecs(newSpecs);
@@ -38,7 +37,11 @@ const StudioPage = () => {
     if (newImageUrl) setImageUrl(newImageUrl);
   };
 
-  /* ── Module 3: show estimation page after user confirms design ── */
+  const handleConfirmDesign = () => {
+    setConfirmed(true);
+  };
+
+  // Module 3: Go to Estimation Page
   if (confirmed) {
     return (
       <PriceEstimationPage
@@ -48,7 +51,7 @@ const StudioPage = () => {
     );
   }
 
-  /* ── Module 1: Studio page ── */
+  // Module 1: Studio Page
   return (
     <div
       className={styles.pageRoot}
@@ -60,22 +63,13 @@ const StudioPage = () => {
           setActiveMetal={setActiveMetal}
           specs={specs}
           imageUrl={imageUrl}
+          onConfirmDesign={handleConfirmDesign}
         />
         <AISidePanel
           onDesignUpdate={handleDesignUpdate}
           currentSpecs={specs}
         />
       </div>
-
-      {/* Confirm button appears only once a design image has been generated */}
-      {imageUrl && (
-        <button
-          className={styles.confirmBtn}
-          onClick={() => setConfirmed(true)}
-        >
-          Confirm Design →
-        </button>
-      )}
     </div>
   );
 };
