@@ -2,40 +2,53 @@ import React, { useState } from "react";
 import styles from "../styles/StudioPage.module.css";
 import DetailsPanel from "./DetailsPanel";
 import AISidePanel from "./AISidePanel";
+import PriceEstimationPage from "./PriceEstimationPage";
 import bgEmeraldSatin from "../assets/Gemini_Generated_Image.png";
 
 const StudioPage = () => {
   const [specs, setSpecs] = useState({
-    size: "20",
-    metal: "18k Gold",
-    stone: "Green Emerald",
-    weight: "3.2 g",
-    cost: "3,150.00 $"
+    size:   "—",
+    metal:  "—",
+    stone:  "—",
+    weight: "—",
+    cost:   "—",
   });
 
   const [activeMetal, setActiveMetal] = useState("emerald");
-  const [modelUrl, setModelUrl] = useState(null); // NEW: Track the 3D model path
+  const [imageUrl,    setImageUrl]    = useState(null);  // 2D image from AI backend
+  const [confirmed,   setConfirmed]   = useState(false); // controls Module 3 transition
 
-  const handleDesignUpdate = (newSpecs, newModelUrl) => {
+  /* Called by AISidePanel when the backend returns a response */
+  const handleDesignUpdate = (newSpecs, newImageUrl) => {
     if (newSpecs) {
       setSpecs(newSpecs);
+
       if (newSpecs.metal) {
-         // Map the metal name from the API to your METALS object keys
-      const metalMap = {
-        "18k gold":   "emerald",
-        "rose gold":  "verdigris",
-        "silver 925": "malachite",
-        "platinum":   "jade",
-      };
-      const key = metalMap[newSpecs.metal.toLowerCase()] ?? "emerald";
-      setActiveMetal(key);
+        const metalMap = {
+          "18k gold":   "emerald",
+          "rose gold":  "verdigris",
+          "silver 925": "malachite",
+          "platinum":   "jade",
+        };
+        const key = metalMap[newSpecs.metal.toLowerCase()] ?? "emerald";
+        setActiveMetal(key);
       }
     }
-    if (newModelUrl) {
-      setModelUrl(newModelUrl);
-     } 
+
+    if (newImageUrl) setImageUrl(newImageUrl);
   };
 
+  /* ── Module 3: show estimation page after user confirms design ── */
+  if (confirmed) {
+    return (
+      <PriceEstimationPage
+        confirmedDesign={{ specs, imageUrl }}
+        onBack={() => setConfirmed(false)}
+      />
+    );
+  }
+
+  /* ── Module 1: Studio page ── */
   return (
     <div
       className={styles.pageRoot}
@@ -46,10 +59,23 @@ const StudioPage = () => {
           activeMetal={activeMetal}
           setActiveMetal={setActiveMetal}
           specs={specs}
-          modelUrl={modelUrl}
+          imageUrl={imageUrl}
         />
-        <AISidePanel onDesignUpdate={handleDesignUpdate} currentSpecs={specs} />
+        <AISidePanel
+          onDesignUpdate={handleDesignUpdate}
+          currentSpecs={specs}
+        />
       </div>
+
+      {/* Confirm button appears only once a design image has been generated */}
+      {imageUrl && (
+        <button
+          className={styles.confirmBtn}
+          onClick={() => setConfirmed(true)}
+        >
+          Confirm Design →
+        </button>
+      )}
     </div>
   );
 };

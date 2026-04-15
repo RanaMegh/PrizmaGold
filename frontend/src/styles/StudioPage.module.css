@@ -15,7 +15,7 @@
   --transition-fast: 0.3s ease;
 }
 
-/* PAGE ROOT */
+/* ── PAGE ROOT ───────────────────────────────────────────── */
 
 .pageRoot {
   min-height: 100vh;
@@ -29,9 +29,10 @@
   background-repeat: no-repeat;
   font-family: sans-serif, serif;
   color: var(--text-dark);
+  position: relative; /* needed for confirmBtn absolute positioning */
 }
 
-/* MAIN WRAPPER */
+/* ── MAIN WRAPPER ────────────────────────────────────────── */
 
 .mainWrapper {
   display: flex;
@@ -44,7 +45,7 @@
   overflow: hidden;
 }
 
-/* LEFT PANEL */
+/* ── LEFT PANEL (Details) ────────────────────────────────── */
 
 .detailsPanel {
   position: relative;
@@ -97,7 +98,7 @@
   color: #b9821c;
 }
 
-/* PRODUCT CARD */
+/* ── PRODUCT CARD ────────────────────────────────────────── */
 
 .productCard {
   display: flex;
@@ -111,35 +112,66 @@
   border: var(--emerald) 2px solid;
 }
 
-.productCardTitle {
-  font-family: serif;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 12px 12px 6px;
-  color: var(--emerald);
-  text-align: center;
-}
+/* ── 2D DESIGN VIEWER ────────────────────────────────────── */
 
-/* ── 3-D RING VIEWER (replaces productImageWrapper / productImage) ── */
-
-.ringViewerWrapper {
+.designViewerWrapper {
   width: 100%;
   height: 190px;
   position: relative;
+  background: #f4f4f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.ringViewerMount {
+.designImage {
   width: 100%;
   height: 100%;
-}
-
-.ringViewerMount canvas {
-  width: 100% !important;
-  height: 100% !important;
+  object-fit: contain;
   display: block;
 }
 
-/* METAL SWITCHER */
+.aiGeneratedBadge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 10px;
+  background: rgba(212, 165, 32, 0.2);
+  border: 1px solid rgba(212, 165, 32, 0.4);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: #c8960a;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+/* Placeholder shown before any design is generated */
+.designPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+}
+
+.placeholderIcon {
+  font-size: 42px;
+  line-height: 1;
+}
+
+.placeholderText {
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 200px;
+}
+
+/* ── METAL SWITCHER ──────────────────────────────────────── */
 
 .metalRow {
   display: flex;
@@ -172,7 +204,7 @@
   border-color: var(--emerald);
 }
 
-/* MEASUREMENT */
+/* ── MEASUREMENT ─────────────────────────────────────────── */
 
 .measurementDiv {
   align-self: center;
@@ -203,6 +235,7 @@
 .measurementsList li {
   display: flex;
   justify-content: space-between;
+  gap: 24px;
   padding: 3px 0;
 }
 
@@ -214,7 +247,7 @@
   color: var(--text-muted);
 }
 
-/* COST BOX */
+/* ── COST BOX ────────────────────────────────────────────── */
 
 .costBox {
   margin-top: auto;
@@ -263,7 +296,33 @@
   color: #d08b1b;
 }
 
-/* RIGHT PANEL */
+/* ── CONFIRM DESIGN BUTTON ───────────────────────────────── */
+
+.confirmBtn {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 40px;
+  background: radial-gradient(circle at 30% 30%, #ffeeb2, var(--gold-deep));
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 700;
+  color: #3a2500;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.confirmBtn:hover {
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+}
+
+/* ── RIGHT PANEL (AI Chat) ───────────────────────────────── */
 
 .aiPanel {
   position: relative;
@@ -298,7 +357,7 @@
   flex-shrink: 0;
 }
 
-/* STATUS BAR */
+/* ── STATUS BAR ──────────────────────────────────────────── */
 
 .statusBar {
   display: flex;
@@ -329,7 +388,7 @@
   letter-spacing: 0.8px;
 }
 
-/* CHAT AREA */
+/* ── CHAT AREA ───────────────────────────────────────────── */
 
 .chatArea {
   flex: 1;
@@ -343,7 +402,7 @@
   margin-top: 12px;
 }
 
-/* CHAT BUBBLES */
+/* ── CHAT BUBBLES ────────────────────────────────────────── */
 
 .chatBubbleRow {
   display: flex;
@@ -351,7 +410,6 @@
   gap: 10px;
 }
 
-/* User bubble row — right-aligned */
 .chatBubbleRowUser {
   display: flex;
   justify-content: flex-end;
@@ -396,7 +454,6 @@
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
 }
 
-/* User bubble style */
 .chatBubbleUser {
   flex: none;
   max-width: 80%;
@@ -405,7 +462,6 @@
   color: #fff8e0;
 }
 
-/* Typing indicator */
 .chatBubbleTyping {
   color: rgba(255, 255, 255, 0.6);
 }
@@ -432,7 +488,7 @@
   50%       { opacity: 1; }
 }
 
-/* INPUT BAR */
+/* ── INPUT BAR ───────────────────────────────────────────── */
 
 .inputBar {
   margin-top: 16px;
@@ -487,7 +543,7 @@
   cursor: default;
 }
 
-/* RESPONSIVE */
+/* ── RESPONSIVE ──────────────────────────────────────────── */
 
 @media (max-width: 991px) {
   .mainWrapper {
@@ -502,35 +558,20 @@
   .aiPanel {
     min-height: 380px;
   }
+
+  .confirmBtn {
+    bottom: 16px;
+    padding: 12px 28px;
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 600px) {
-  .pageRoot {
-    padding: 12px;
-  }
-
-  .mainWrapper {
-    border-radius: 20px;
-  }
-
-  .detailsPanel {
-    padding: 20px 18px 22px;
-  }
-
-  .detailsTitle {
-    font-size: 24px;
-  }
-
-  .aiTitle {
-    font-size: 22px;
-  }
-
-  .inputBar {
-    padding-left: 14px;
-  }
-
-  .sendButton {
-    width: 36px;
-    height: 36px;
-  }
+  .pageRoot    { padding: 12px; }
+  .mainWrapper { border-radius: 20px; }
+  .detailsPanel { padding: 20px 18px 22px; }
+  .detailsTitle { font-size: 24px; }
+  .aiTitle      { font-size: 22px; }
+  .inputBar     { padding-left: 14px; }
+  .sendButton   { width: 36px; height: 36px; }
 }

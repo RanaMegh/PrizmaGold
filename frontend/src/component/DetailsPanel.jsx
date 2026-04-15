@@ -2,7 +2,7 @@ import React from "react";
 import styles from "../styles/StudioPage.module.css";
 import ProductCard from "./ProductCard";
 
-const DetailsPanel = ({ activeMetal, setActiveMetal, specs, modelUrl }) => {
+const DetailsPanel = ({ activeMetal, setActiveMetal, specs, imageUrl }) => {
   return (
     <section className={styles.detailsPanel}>
       <button className={styles.backButton} aria-label="Go back">
@@ -15,7 +15,7 @@ const DetailsPanel = ({ activeMetal, setActiveMetal, specs, modelUrl }) => {
         activeMetal={activeMetal}
         setActiveMetal={setActiveMetal}
         specs={specs}
-        modelUrl={modelUrl}
+        imageUrl={imageUrl}
       />
     </section>
   );
