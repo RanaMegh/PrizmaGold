@@ -1,0 +1,152 @@
+.welcome-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+/* Background */
+.background {
+  position: absolute;
+  inset: 0;
+  background-image: url('/jewelry-bg.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Card */
+.welcome-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 460px;
+  min-height: 620px;
+
+  padding: 50px 30px;
+  border-radius: 45px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+
+  background: rgba(15, 15, 15, 0.5);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+/* Logo */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.logo-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0a1a0a;
+  border: 1px solid rgba(212,175,55,0.3);
+}
+
+.logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logo-section h1 {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Title */
+.title-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.title-section h2 {
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.title-section p {
+  color: gray;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+/* Buttons */
+.button-group {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.btn {
+  width: 100%;
+  padding: 18px 0;
+  border-radius: 18px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.primary {
+  background: #e3bc54;
+  color: black;
+  font-weight: bold;
+}
+
+.secondary {
+  background: rgba(255,255,255,0.05);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  opacity: 0.4;
+}
+
+.line {
+  width: 40px;
+  height: 1px;
+  background: #d4af37;
+  margin: 0 auto 10px;
+}
+
+.footer p {
+  font-size: 10px;
+  letter-spacing: 5px;
+  color: #ccc;
+  text-transform: uppercase;
+}
